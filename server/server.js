@@ -28,6 +28,14 @@ app.use(
 
 app.use(express.json());
 
+// Handle malformed JSON request bodies
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({ error: "Malformed JSON in request body" });
+  }
+  next(err);
+});
+
 app.get("/api/books", async (req, res) => {
   const validation = validateQueryParams(req.query);
   if (!validation.isValid) {
@@ -225,6 +233,22 @@ app.get("/api/stats", async (req, res) => {
     averageRating,
     byGenre,
   });
+});
+
+// Deliberate test crash route to prove error-handling middleware
+app.get("/api/crash", async (req, res) => {
+  throw new Error("Deliberate test crash");
+});
+
+// 404 fallback for unmatched /api routes
+app.use("/api", (req, res) => {
+  return res.status(404).json({ error: "Not found" });
+});
+
+// Global error-handling middleware
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err.message);
+  return res.status(500).json({ error: "Something went wrong" });
 });
 
 app.listen(PORT, () => {
