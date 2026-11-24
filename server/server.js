@@ -235,11 +235,6 @@ app.get("/api/stats", async (req, res) => {
   });
 });
 
-// Deliberate test crash route to prove error-handling middleware
-app.get("/api/crash", async (req, res) => {
-  throw new Error("Deliberate test crash");
-});
-
 // 404 fallback for unmatched /api routes
 app.use("/api", (req, res) => {
   return res.status(404).json({ error: "Not found" });
