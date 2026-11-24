@@ -1,4 +1,4 @@
-export default function BookList({ books, loading, error }) {
+export default function BookList({ books, loading, error, onEdit }) {
   if (loading) {
     return <div className="status-message loading">Loading books...</div>;
   }
@@ -36,6 +36,13 @@ export default function BookList({ books, loading, error }) {
                 : "Unrated"}
             </span>
           </div>
+          {onEdit && (
+            <div className="book-card-actions">
+              <button type="button" onClick={() => onEdit(book)}>
+                Edit
+              </button>
+            </div>
+          )}
         </article>
       ))}
     </div>
