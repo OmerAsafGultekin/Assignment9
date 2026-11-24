@@ -56,9 +56,15 @@ app.get("/api/books", async (req, res) => {
       return order === "desc" ? b.year - a.year : a.year - b.year;
     }
     if (sort === "rating") {
-      return order === "desc"
-        ? (b.rating ?? 0) - (a.rating ?? 0)
-        : (a.rating ?? 0) - (b.rating ?? 0);
+      const aRated = a.rating !== null && a.rating !== undefined;
+      const bRated = b.rating !== null && b.rating !== undefined;
+
+      if (aRated && !bRated) return -1;
+      if (!aRated && bRated) return 1;
+      if (!aRated && !bRated) return a.id - b.id;
+
+      const diff = order === "desc" ? b.rating - a.rating : a.rating - b.rating;
+      return diff !== 0 ? diff : a.id - b.id;
     }
     return order === "desc" ? b.id - a.id : a.id - b.id;
   });
