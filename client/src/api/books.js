@@ -40,11 +40,23 @@ async function request(endpoint, options = {}) {
 
 export async function fetchBooks(params = {}, signal) {
   const searchParams = new URLSearchParams();
+
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null && value !== "") {
-      searchParams.set(key, value);
+    if (value === undefined || value === null) {
+      continue;
+    }
+
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (trimmed === "" || trimmed.toLowerCase() === "all") {
+        continue;
+      }
+      searchParams.set(key, trimmed);
+    } else {
+      searchParams.set(key, String(value));
     }
   }
+
   const queryString = searchParams.toString();
   const endpoint = queryString ? `/api/books?${queryString}` : "/api/books";
   return request(endpoint, { signal });
