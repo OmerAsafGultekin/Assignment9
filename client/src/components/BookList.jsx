@@ -1,4 +1,12 @@
-export default function BookList({ books, loading, error, onEdit }) {
+export default function BookList({
+  books,
+  loading,
+  error,
+  onEdit,
+  onToggleRead,
+  onRate,
+  onDelete,
+}) {
   if (loading) {
     return <div className="status-message loading">Loading books...</div>;
   }
@@ -36,13 +44,50 @@ export default function BookList({ books, loading, error, onEdit }) {
                 : "Unrated"}
             </span>
           </div>
-          {onEdit && (
-            <div className="book-card-actions">
-              <button type="button" onClick={() => onEdit(book)}>
-                Edit
-              </button>
-            </div>
-          )}
+
+          <div className="book-card-actions">
+            <button
+              type="button"
+              onClick={() => onToggleRead(book)}
+              title={book.read ? "Mark as unread" : "Mark as read"}
+            >
+              {book.read ? "Mark Unread" : "Mark Read"}
+            </button>
+
+            {book.read && (
+              <div className="rating-control">
+                <label htmlFor={`rating-${book.id}`}>Rating:</label>
+                <select
+                  id={`rating-${book.id}`}
+                  value={book.rating ?? ""}
+                  onChange={(e) => {
+                    const val =
+                      e.target.value === "" ? null : Number(e.target.value);
+                    onRate(book.id, val);
+                  }}
+                >
+                  <option value="">None</option>
+                  <option value="1">1 Star</option>
+                  <option value="2">2 Stars</option>
+                  <option value="3">3 Stars</option>
+                  <option value="4">4 Stars</option>
+                  <option value="5">5 Stars</option>
+                </select>
+              </div>
+            )}
+
+            <button type="button" onClick={() => onEdit(book)}>
+              Edit
+            </button>
+
+            <button
+              type="button"
+              className="danger"
+              onClick={() => onDelete(book.id)}
+            >
+              Delete
+            </button>
+          </div>
         </article>
       ))}
     </div>

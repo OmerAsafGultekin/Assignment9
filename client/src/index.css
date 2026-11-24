@@ -97,6 +97,81 @@ input:focus, select:focus {
   outline-offset: 1px;
 }
 
+/* Statistics Panel */
+.stats-panel {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.stats-panel h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #0f172a;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  background-color: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 0.25rem;
+}
+
+.stats-genres {
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.75rem;
+}
+
+.stats-genres h3 {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.genre-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.genre-count-badge {
+  background-color: #f1f5f9;
+  border: 1px solid var(--border-color);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: var(--text-main);
+}
+
 /* Form Styles */
 .book-form {
   background-color: var(--card-bg);
@@ -278,8 +353,17 @@ input:focus, select:focus {
 
 .book-card-actions {
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
   margin-top: 1rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border-color);
+}
+
+.rating-control {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
 }
