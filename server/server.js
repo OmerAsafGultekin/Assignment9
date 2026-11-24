@@ -1,7 +1,20 @@
 import express from "express";
 import cors from "cors";
-import { getAllBooks, getBookById } from "./booksStore.js";
-import { validateId, validateQueryParams } from "./validate.js";
+import {
+  getAllBooks,
+  getBookById,
+  findDuplicateBook,
+  createBook,
+  replaceBook,
+  updateBook,
+  deleteBook,
+} from "./booksStore.js";
+import {
+  validateId,
+  validateQueryParams,
+  validateBookPayload,
+  validatePatchPayload,
+} from "./validate.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -87,6 +100,95 @@ app.get("/api/books/:id", async (req, res) => {
   }
 
   return res.status(200).json(book);
+});
+
+app.post("/api/books", async (req, res) => {
+  const validation = validateBookPayload(req.body);
+  if (!validation.isValid) {
+    return res.status(400).json({ error: validation.error });
+  }
+
+  const { title, author } = validation.data;
+  const duplicate = await findDuplicateBook(title, author);
+  if (duplicate) {
+    return res.status(409).json({
+      error: "A book with the same title and author already exists",
+    });
+  }
+
+  const newBook = await createBook(validation.data);
+  res.setHeader("Location", `/api/books/${newBook.id}`);
+  return res.status(201).json(newBook);
+});
+
+app.put("/api/books/:id", async (req, res) => {
+  const idValidation = validateId(req.params.id);
+  if (!idValidation.isValid) {
+    return res.status(400).json({ error: idValidation.error });
+  }
+
+  const existingBook = await getBookById(idValidation.id);
+  if (!existingBook) {
+    return res.status(404).json({ error: "Book not found" });
+  }
+
+  const payloadValidation = validateBookPayload(req.body);
+  if (!payloadValidation.isValid) {
+    return res.status(400).json({ error: payloadValidation.error });
+  }
+
+  const { title, author } = payloadValidation.data;
+  const duplicate = await findDuplicateBook(title, author, idValidation.id);
+  if (duplicate) {
+    return res.status(409).json({
+      error: "A book with the same title and author already exists",
+    });
+  }
+
+  const replacedBook = await replaceBook(idValidation.id, payloadValidation.data);
+  return res.status(200).json(replacedBook);
+});
+
+app.patch("/api/books/:id", async (req, res) => {
+  const idValidation = validateId(req.params.id);
+  if (!idValidation.isValid) {
+    return res.status(400).json({ error: idValidation.error });
+  }
+
+  const existingBook = await getBookById(idValidation.id);
+  if (!existingBook) {
+    return res.status(404).json({ error: "Book not found" });
+  }
+
+  const patchValidation = validatePatchPayload(existingBook, req.body);
+  if (!patchValidation.isValid) {
+    return res.status(400).json({ error: patchValidation.error });
+  }
+
+  const { title, author } = patchValidation.data;
+  const duplicate = await findDuplicateBook(title, author, idValidation.id);
+  if (duplicate) {
+    return res.status(409).json({
+      error: "A book with the same title and author already exists",
+    });
+  }
+
+  const updatedBook = await updateBook(idValidation.id, patchValidation.data);
+  return res.status(200).json(updatedBook);
+});
+
+app.delete("/api/books/:id", async (req, res) => {
+  const idValidation = validateId(req.params.id);
+  if (!idValidation.isValid) {
+    return res.status(400).json({ error: idValidation.error });
+  }
+
+  const deleted = await deleteBook(idValidation.id);
+  if (!deleted) {
+    return res.status(404).json({ error: "Book not found" });
+  }
+
+  return res.status(204).end();
 });
 
 app.get("/api/stats", async (req, res) => {
