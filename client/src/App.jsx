@@ -1,18 +1,26 @@
 import { useState, useEffect } from "react";
 import { fetchBooks } from "./api/books.js";
 import BookList from "./components/BookList.jsx";
+import FilterBar from "./components/FilterBar.jsx";
 
 export default function App() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    q: "",
+    genre: "",
+    read: "",
+    sort: "id",
+    order: "asc",
+  });
 
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
     setError(null);
 
-    fetchBooks({}, controller.signal)
+    fetchBooks(filters, controller.signal)
       .then((data) => {
         setBooks(data);
         setLoading(false);
@@ -27,7 +35,7 @@ export default function App() {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [filters]);
 
   return (
     <div className="app-container">
@@ -35,6 +43,7 @@ export default function App() {
         <h1>Reading List</h1>
       </header>
       <main>
+        <FilterBar filters={filters} onFilterChange={setFilters} />
         <BookList books={books} loading={loading} error={error} />
       </main>
     </div>
